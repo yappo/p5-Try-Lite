@@ -11,7 +11,7 @@ use Scalar::Util;
 use Carp;
 $Carp::Internal{+__PACKAGE__}++;
 
-sub try (&;@) {
+sub try (&;%) {
     my($try, @catches) = @_;
 
     confess 'Unknown @catches values. Check your usage & try again'
@@ -84,23 +84,82 @@ __END__
 
 =head1 NAME
 
-Try::Lite - ...
+Try::Lite - easy exception catcher with auto rethrow
 
 =head1 SYNOPSIS
 
   use Try::Lite;
+  try {
+      YourExceptionClass->throw;
+  }
+      'YourExceptionClass' => sub {
+          say ref($@); # show 'YourExceptionClass'
+      };
+
+you can catch base exception class:
+
+  package YourExceptionClass {
+      use parent 'BaseExceptionClass';
+  }
+  
+  try {
+      YourExceptionClass->throw;
+  }
+      'BaseExceptionClass' => sub {
+          say ref($@); # show 'YourExceptionClass'
+      };
+
+you can catch any exception:
+
+  try {
+      die "oops\n";
+  }
+      '*' => sub {
+          say $@; # show "oops\n";
+      };
+
+auto rethrow:
+
+  eval {
+      try {
+          die "oops\n";
+      }
+          'YourExceptionClass' => sub {};
+  };
+  say $@; # show "oops\n"
+
+you can any exception catch:
+
+  sub run (&) {
+    my $code = shift;
+  
+    try { $code->() }
+      'FileException'    => sub { say 'file exception' },
+      'NetworkException' => sub { say 'network exception' };
+  }
+  
+  run { FileException->throw };    # show 'file exception'
+  run { NetworkException->throw }; # show 'network exception'
+  run { die 'oops' };              # Died
 
 =head1 DESCRIPTION
 
-Try::Lite is
+Try::Lite is easy exception catch with Exception classes.
+Exception other than the all specified conditions are It run rethrow.
 
 B<THIS IS A DEVELOPMENT RELEASE. API MAY CHANGE WITHOUT NOTICE>.
+
+=head1 EXPORT
+
+=head2 try $code_ref, %catche_rules
 
 =head1 AUTHOR
 
 Kazuhiro Osawa E<lt>yappo {@} shibuya {dot} plE<gt>
 
 =head1 SEE ALSO
+
+try function base is L<Try::Tiny>
 
 =head1 LICENSE
 
