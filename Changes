@@ -1,4 +1,8 @@
 Revision history for Perl extension Try::Lite
 
+0.0.2 2013-02-18T14:31:01+09:00
+    - you can receives the return value of the catches return value
+    - doc fixs
+
 0.0.1 2013-02-15T20:46:36+09:00
     - original version
