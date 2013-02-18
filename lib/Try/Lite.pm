@@ -90,10 +90,11 @@ Try::Lite - easy exception catcher with auto rethrow
   use Try::Lite;
   try {
       YourExceptionClass->throw;
-  }
+  } (
       'YourExceptionClass' => sub {
           say ref($@); # show 'YourExceptionClass'
-      };
+      }
+  );
 
 You can catch base exception class:
 
@@ -103,27 +104,30 @@ You can catch base exception class:
   
   try {
       YourExceptionClass->throw;
-  }
+  } (
       'BaseExceptionClass' => sub {
           say ref($@); # show 'YourExceptionClass'
-      };
+      }
+  );
 
 You can catch any exception:
 
   try {
       die "oops\n";
-  }
+  } (
       '*' => sub {
           say $@; # show "oops\n";
-      };
+      }
+  );
 
 If there is no matched catch clause, Try::Lite rethrow the exception automatically:
 
   eval {
       try {
           die "oops\n";
-      }
-          'YourExceptionClass' => sub {};
+      } (
+          'YourExceptionClass' => sub {}
+      );
   };
   say $@; # show "oops\n"
 
@@ -131,12 +135,12 @@ You can receives the  try block return value and catechs subs return value:
 
   my $ret = try {
       'foo'
-  } '*' => sub {};
+  } ( '*' => sub {} );
   say $ret; # show 'foo'
   
   my $ret = try {
       die 'foo'
-  } '*' => sub { 'bar' };
+  } ( '*' => sub { 'bar' } );
   say $ret; # show 'bar'
 
 You can catch any exceptions:
@@ -144,9 +148,10 @@ You can catch any exceptions:
   sub run (&) {
     my $code = shift;
   
-    try { $code->() }
+    try { $code->() } (
       'FileException'    => sub { say 'file exception' },
-      'NetworkException' => sub { say 'network exception' };
+      'NetworkException' => sub { say 'network exception' }
+    );
   }
   
   run { FileException->throw };    # show 'file exception'
