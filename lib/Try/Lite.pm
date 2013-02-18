@@ -64,8 +64,7 @@ sub try (&;%) {
             next unless $class eq '*' || (Scalar::Util::blessed($error) && UNIVERSAL::isa($error, $class));
 
             local $@ = $error;
-            $code->();
-            return;
+            return $code->();
         }
 
         # rethrow
@@ -127,6 +126,18 @@ If there is no matched catch clause, Try::Lite rethrow the exception automatical
           'YourExceptionClass' => sub {};
   };
   say $@; # show "oops\n"
+
+You can receives the  try block return value and catechs subs return value:
+
+  my $ret = try {
+      'foo'
+  } '*' => sub {};
+  say $ret; # show 'foo'
+  
+  my $ret = try {
+      die 'foo'
+  } '*' => sub { 'bar' };
+  say $ret; # show 'bar'
 
 You can catch any exceptions:
 
