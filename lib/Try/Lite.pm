@@ -96,7 +96,7 @@ Try::Lite - easy exception catcher with auto rethrow
           say ref($@); # show 'YourExceptionClass'
       };
 
-you can catch base exception class:
+You can catch base exception class:
 
   package YourExceptionClass {
       use parent 'BaseExceptionClass';
@@ -109,7 +109,7 @@ you can catch base exception class:
           say ref($@); # show 'YourExceptionClass'
       };
 
-you can catch any exception:
+You can catch any exception:
 
   try {
       die "oops\n";
@@ -118,7 +118,7 @@ you can catch any exception:
           say $@; # show "oops\n";
       };
 
-auto rethrow:
+If there is no matched catch clause, Try::Lite rethrow the exception automatically:
 
   eval {
       try {
@@ -128,7 +128,7 @@ auto rethrow:
   };
   say $@; # show "oops\n"
 
-you can any exception catch:
+You can catch any exceptions:
 
   sub run (&) {
     my $code = shift;
