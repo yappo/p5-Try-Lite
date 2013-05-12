@@ -8,6 +8,7 @@ our $VERSION = '0.0.2';
 our @EXPORT = 'try';
 
 use Scalar::Util;
+use Scope::Guard;
 use Carp;
 $Carp::Internal{+__PACKAGE__}++;
 
@@ -29,13 +30,13 @@ sub try (&;%) {
 
     # save the value of $@ so we can set $@ back to it in the beginning of the eval
     my $prev_error = $@;
+    my $no_rethrow = 0;
+    my $guard = Scope::Guard::guard {
+        $@ = $prev_error if $no_rethrow;
+    };
 
-    my(@ret, $error, $failed);
+    my(@ret, $failed);
     {
-        # localize $@ to prevent clobbering of previous value by a successful
-        # eval.
-        local $@;
-
         # failed will be true if the eval dies, because 1 will not be returned
         # from the eval body
         $failed = not eval {
@@ -52,26 +53,29 @@ sub try (&;%) {
 
             return 1; # properly set $fail to false
         };
-
-        # copy $@ to $error; when we leave this scope, local $@ will revert $@
-        # back to its previous value
-        $error = $@;
     }
 
     if ($failed) {
         for (my $i = 0;$i < @catches;$i += 2) {
             my($class, $code) = ($catches[$i], $catches[$i + 1]);
-            next unless $class eq '*' || (Scalar::Util::blessed($error) && UNIVERSAL::isa($error, $class));
+            next unless $class eq '*' || (Scalar::Util::blessed($@) && UNIVERSAL::isa($@, $class));
 
-            local $@ = $error;
-            return $code->();
+            if ( $wantarray ) {
+                @ret = $code->();
+            } else {
+                $ret[0] = $code->();
+            }
+            if ( @ret ) {
+                $no_rethrow = 1;
+                return $wantarray ? @ret : $ret[0];
+            }
         }
-
         # rethrow
-        die $error;
+        die;
     }
 
     # no failure, $@ is back to what it was, everything is fine
+    $no_rethrow = 1;
     return $wantarray ? @ret : $ret[0];
 }
 

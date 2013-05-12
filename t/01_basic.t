@@ -16,6 +16,7 @@ subtest 'simple' => sub {
             push @exceptions, ref($@);
         }
     );
+    is $@, '', 'locarize $@';
 
     try {
         YourException->throw;
@@ -69,6 +70,24 @@ subtest 'not catch' => sub {
         ok 0;
     };
     isa_ok $@, 'YourException';
+};
+
+subtest 'nexted try catch' => sub {
+    my $caught_exception;
+    try {
+        try {
+            MyException->throw;
+        } (
+            '*' => sub {
+                die;
+            }
+        );
+    } (
+        '*' => sub {
+            $caught_exception = $@;
+        }
+    );
+    isa_ok $caught_exception, 'MyException';
 };
 
 done_testing;
