@@ -15,6 +15,7 @@ my $build = Module::Build->new(
         'Exporter'     => '0',
         'parent'       => '0',
         'Scalar::Util' => '0',
+        'Scope::Guard' => '0',
     },
 
     no_index    => { 'directory' => [ 'inc' ] },
