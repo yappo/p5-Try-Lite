@@ -28,43 +28,50 @@ sub try (&;%) {
     my $wantarray = wantarray;
 
     # save the value of $@ so we can set $@ back to it in the beginning of the eval
+    # and restore $@ after the eval finishes
     my $prev_error = $@;
 
-    my(@ret, $error, $failed);
-    {
-        # localize $@ to prevent clobbering of previous value by a successful
-        # eval.
-        local $@;
+    my @ret;
 
-        # failed will be true if the eval dies, because 1 will not be returned
-        # from the eval body
-        $failed = not eval {
-            $@ = $prev_error;
+    # failed will be true if the eval dies, because 1 will not be returned
+    # from the eval body
+    my $failed = not eval {
+        $@ = $prev_error;
 
-            # evaluate the try block in the correct context
-            if ( $wantarray ) {
-                @ret = $try->();
-            } elsif ( defined $wantarray ) {
-                $ret[0] = $try->();
-            } else {
-                $try->();
-            };
-
-            return 1; # properly set $fail to false
+        # evaluate the try block in the correct context
+        if ( $wantarray ) {
+            @ret = $try->();
+        } elsif ( defined $wantarray ) {
+            $ret[0] = $try->();
+        } else {
+            $try->();
         };
 
-        # copy $@ to $error; when we leave this scope, local $@ will revert $@
-        # back to its previous value
-        $error = $@;
-    }
+        return 1; # properly set $fail to false
+    };
+
+    # preserve the current error and reset the original value of $@
+    my $error = $@;
+    $@        = $prev_error;
 
     if ($failed) {
         for (my $i = 0;$i < @catches;$i += 2) {
             my($class, $code) = ($catches[$i], $catches[$i + 1]);
             next unless $class eq '*' || (Scalar::Util::blessed($error) && UNIVERSAL::isa($error, $class));
 
-            local $@ = $error;
-            return $code->();
+            # evaluate the catch block in the correct context
+            $@ = $error;
+            my @ret;
+            if ( $wantarray ) {
+                @ret = $code->();
+            } elsif ( defined $wantarray ) {
+                $ret[0] = $code->();
+            } else {
+                $code->();
+            };
+
+            $@ = $prev_error;
+            return $wantarray ? @ret : $ret[0];
         }
 
         # rethrow
