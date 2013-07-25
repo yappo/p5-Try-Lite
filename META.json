@@ -60,7 +60,7 @@
          "web" : "https://github.com/yappo/p5-Try-Lite"
       }
    },
-   "version" : "0.0.2",
+   "version" : "0.0.3",
    "x_contributors" : [
       "Kazuhiro Osawa <yappo@shibuya.pl>",
       "Tokuhiro Matsuno <tokuhirom@gmail.com>"

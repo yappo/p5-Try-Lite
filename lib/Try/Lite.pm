@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use parent 'Exporter';
 use 5.008005;
-our $VERSION = '0.0.2';
+our $VERSION = '0.0.3';
 
 our @EXPORT = 'try';
 
