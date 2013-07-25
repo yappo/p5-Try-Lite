@@ -1,0 +1,54 @@
+{
+   "abstract" : "easy exception catcher with auto rethrow",
+   "author" : [
+      "Kazuhiro Osawa E<lt>yappo {@} shibuya {dot} plE<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Try-Lite",
+   "no_index" : {
+      "directory" : [
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : 0,
+            "Scalar::Util" : 0,
+            "parent" : 0,
+            "perl" : "5.008005"
+         }
+      }
+   },
+   "provides" : {
+      "Try::Lite" : {
+         "file" : "lib/Try/Lite.pm",
+         "version" : "v0.0.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.0.2"
+}
